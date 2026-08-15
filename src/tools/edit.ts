@@ -1,4 +1,5 @@
 import type { FileStore } from "../file/interface.ts";
+import { structuredError } from "./aci.ts";
 import { requireString } from "./args.ts";
 import type { Tool } from "./types.ts";
 
@@ -31,25 +32,33 @@ export function createEditFileTool(files: FileStore): Tool {
       const filePath = requireString(args, "path");
       const oldText = requireString(args, "old_text");
       const newText = requireString(args, "new_text", { allowEmpty: true });
-      const current = await files.read(filePath);
-      const matches = countOccurrences(current, oldText);
+      try {
+        const current = await files.read(filePath);
+        const matches = countOccurrences(current, oldText);
 
-      if (matches === 0) {
-        throw new Error(`old_text was not found in ${filePath}`);
-      }
-      if (matches > 1) {
-        throw new Error(
-          `old_text matched ${matches} times in ${filePath}; include more surrounding context so it matches exactly once`,
-        );
-      }
+        if (matches === 0) {
+          return structuredError("edit", "old_text was not found", { path: filePath });
+        }
+        if (matches > 1) {
+          return structuredError(
+            "edit",
+            `old_text matched ${matches} times; include more surrounding context`,
+            { path: filePath },
+          );
+        }
 
-      await files.write(filePath, current.replace(oldText, newText));
-      return `Edited ${filePath}`;
+        await files.write(filePath, current.replace(oldText, newText));
+        return `OK edit\npath: ${filePath}`;
+      } catch (error) {
+        return structuredError("edit", error instanceof Error ? error.message : String(error), {
+          path: filePath,
+        });
+      }
     },
   };
 }
 
-function countOccurrences(haystack: string, needle: string): number {
+export function countOccurrences(haystack: string, needle: string): number {
   let count = 0;
   let from = 0;
   while (from <= haystack.length - needle.length) {

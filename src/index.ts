@@ -3,12 +3,17 @@ import { fileURLToPath } from "node:url";
 import { printBanner } from "./cli/banner.ts";
 import { createWorkspaceFileStore } from "./file/index.ts";
 import { createLlmProvider } from "./llm/index.ts";
+import { createSessionLog } from "./log/session-log.ts";
+import { loadPackageVersion } from "./package-info.ts";
 import {
   createPermissionGate,
   loadPermissionMode,
 } from "./permissions/index.ts";
+import { loadAgentsMd } from "./prompt/agents-md.ts";
+import { buildSystemPrompt } from "./prompt/system.ts";
 import { createStdio, runSession } from "./session.ts";
-import { createFileTools } from "./tools/index.ts";
+import { loadSkills, toSkillMeta } from "./skills/index.ts";
+import { createAgentTools, type TodoItem } from "./tools/index.ts";
 
 export { createWorkspaceFileStore, type FileStore } from "./file/index.ts";
 export {
@@ -34,6 +39,7 @@ export {
 export { printBanner, renderBanner, type BannerInfo } from "./cli/banner.ts";
 export { createStdio, runSession, type InputOutput } from "./session.ts";
 export {
+  createAgentTools,
   createEditFileTool,
   createFileTools,
   createReadFileTool,
@@ -46,26 +52,40 @@ export {
 
 async function main(): Promise<void> {
   const permissionMode = loadPermissionMode();
-  printBanner({
-    name: "coding-agent",
-    version: "1.0.0",
-    model: process.env.LLM_MODEL ?? "grok-4.6",
-    workspace: process.cwd(),
-    permissions: permissionMode,
-    tools: ["read_file", "write_file", "edit"],
+  const skills = await loadSkills();
+  const agentsMd = await loadAgentsMd();
+  const systemPrompt = buildSystemPrompt({
+    agentsMd,
+    skills: toSkillMeta(skills),
   });
-
+  const todos: TodoItem[] = [];
+  const turn = { planned: false };
   const llm = createLlmProvider();
   const files = createWorkspaceFileStore();
-  const tools = createFileTools(files);
+  const tools = createAgentTools({ files, llm, skills, todos, turn });
   const io = createStdio();
   const permissions = createPermissionGate({
     mode: permissionMode,
     ask: (question) => io.ask(question),
   });
+  const log = await createSessionLog();
+
+  printBanner({
+    name: "coding-agent",
+    version: loadPackageVersion(),
+    model: process.env.LLM_MODEL ?? "grok-4.6",
+    workspace: process.cwd(),
+    permissions: permissionMode,
+    tools: tools.map((tool) => tool.definition.name),
+  });
 
   try {
-    await runSession(llm, io, tools, permissions);
+    await runSession(llm, io, tools, permissions, {
+      systemPrompt,
+      turn,
+      todos,
+      log,
+    });
   } finally {
     io.close();
   }

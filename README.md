@@ -45,9 +45,16 @@ Layers do not reach across each other:
 
 | Tool         | What it does                                                 |
 | ------------ | ------------------------------------------------------------ |
-| `read_file`  | Read a UTF-8 file                                            |
-| `write_file` | Create or overwrite a file                                   |
-| `edit`       | Replace exactly one occurrence of `old_text` with `new_text` |
+| `read_file`   | Read a UTF-8 file with line numbers                          |
+| `write_file`  | Create or overwrite a file                                   |
+| `edit`        | Replace exactly one occurrence of `old_text` with `new_text` |
+| `grep`        | Search file contents                                         |
+| `glob` / `ls` | Find and list files                                          |
+| `bash`        | Allowlisted shell (typecheck, tests, safe git)               |
+| `todo_write`  | Session checklist                                            |
+| `submit_plan` | Required before mutating files or running the shell          |
+| `read_skill`  | Load a `SKILL.md` playbook                                   |
+| `explore`     | Read-only subagent for codebase questions                    |
 
 Tools depend on `FileStore`, not `fs` directly. The LLM layer only sees names, descriptions, and JSON arguments.
 
@@ -69,9 +76,13 @@ src/
   session.ts         REPL + tool loop
   llm/               types, env config, OpenAI-compatible client
   file/              FileStore interface + workspace implementation
-  tools/             read_file, write_file, edit
+  tools/             LLM tools (files, search, bash, todos, skills)
   permissions/       gate and mode
   cli/               banner, spinner, tool status, permission view
+  prompt/            system prompt and AGENTS.md loader
+  skills/            SKILL.md discovery
+  context/           output truncation and history compaction
+skills/              verify, explore, debug, review, git-commit, plan
 ```
 
 ## Setup
@@ -99,6 +110,7 @@ node --env-file=.env src/index.ts
 | `LLM_MODEL`        | Model id                      |
 | `TOOL_PERMISSIONS` | `prompt` \| `allow` \| `deny` | `prompt` on a TTY, else `deny`  |
 | `NO_COLOR`         | Disable ANSI color            | unset                           |
+| `SESSION_LOG`      | `1` writes a JSONL transcript | unset                           |
 
 Point `LLM_BASE_URL` at any compatible host, including OpenCode Go (`https://opencode.ai/zen/go/v1`).
 

@@ -1,13 +1,13 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import type { FileStore } from "./interface.ts";
+import type { DirEntry, FileStore } from "./interface.ts";
 
 export function createWorkspaceFileStore(root: string = process.cwd()): FileStore {
   return new WorkspaceFileStore(root);
 }
 
 class WorkspaceFileStore implements FileStore {
-  private readonly root: string;
+  readonly root: string;
 
   constructor(root: string) {
     this.root = path.resolve(root);
@@ -23,12 +23,23 @@ class WorkspaceFileStore implements FileStore {
     await writeFile(resolved, content, "utf8");
   }
 
-  private resolve(filePath: string): string {
+  resolve(filePath: string): string {
     const resolved = path.resolve(this.root, filePath);
     const prefix = this.root.endsWith(path.sep) ? this.root : `${this.root}${path.sep}`;
     if (resolved !== this.root && !resolved.startsWith(prefix)) {
       throw new Error(`Path is outside the workspace: ${filePath}`);
     }
     return resolved;
+  }
+
+  async list(dirPath = "."): Promise<DirEntry[]> {
+    const resolved = this.resolve(dirPath);
+    const entries = await readdir(resolved, { withFileTypes: true });
+    return entries
+      .map((entry) => ({
+        name: entry.name,
+        type: entry.isDirectory() ? ("dir" as const) : ("file" as const),
+      }))
+      .sort((left, right) => left.name.localeCompare(right.name));
   }
 }

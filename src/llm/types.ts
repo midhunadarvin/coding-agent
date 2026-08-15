@@ -44,4 +44,5 @@ export interface LlmConfig {
 
 export interface LlmProvider {
   chat(request: ChatRequest): Promise<ChatResponse>;
+  chatStream(request: ChatRequest, onDelta: (text: string) => void): Promise<ChatResponse>;
 }

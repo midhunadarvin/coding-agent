@@ -1,4 +1,5 @@
 import type { FileStore } from "../file/interface.ts";
+import { structuredError } from "./aci.ts";
 import { requireString } from "./args.ts";
 import type { Tool } from "./types.ts";
 
@@ -26,8 +27,14 @@ export function createWriteFileTool(files: FileStore): Tool {
     async execute(args: Record<string, unknown>): Promise<string> {
       const filePath = requireString(args, "path");
       const content = requireString(args, "content");
-      await files.write(filePath, content);
-      return `Wrote ${content.length} bytes to ${filePath}`;
+      try {
+        await files.write(filePath, content);
+        return `OK write_file\npath: ${filePath}\nbytes: ${content.length}`;
+      } catch (error) {
+        return structuredError("write_file", error instanceof Error ? error.message : String(error), {
+          path: filePath,
+        });
+      }
     },
   };
 }

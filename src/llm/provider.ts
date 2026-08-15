@@ -70,6 +70,70 @@ class OpenAiCompatibleProvider implements LlmProvider {
         : undefined,
     };
   }
+
+  async chatStream(
+    request: ChatRequest,
+    onDelta: (text: string) => void,
+  ): Promise<ChatResponse> {
+    const stream = await this.client.chat.completions.create({
+      model: request.model ?? this.model,
+      messages: request.messages.map(toOpenAiMessage),
+      temperature: request.temperature,
+      max_tokens: request.maxTokens,
+      tools: request.tools?.map((tool) => ({
+        type: "function" as const,
+        function: {
+          name: tool.name,
+          description: tool.description,
+          parameters: tool.parameters,
+        },
+      })),
+      stream: true,
+    });
+
+    let content = "";
+    let model = this.model;
+    let sawTools = false;
+    const assembled: Array<{ id: string; name: string; arguments: string }> = [];
+
+    for await (const chunk of stream) {
+      if (chunk.model) {
+        model = chunk.model;
+      }
+      const delta = chunk.choices[0]?.delta;
+      if (!delta) {
+        continue;
+      }
+      if (delta.content) {
+        content += delta.content;
+        if (!sawTools) {
+          onDelta(delta.content);
+        }
+      }
+      for (const part of delta.tool_calls ?? []) {
+        sawTools = true;
+        const index = part.index ?? 0;
+        const current = assembled[index] ?? { id: "", name: "", arguments: "" };
+        if (part.id) {
+          current.id = part.id;
+        }
+        if (part.function?.name) {
+          current.name += part.function.name;
+        }
+        if (part.function?.arguments) {
+          current.arguments += part.function.arguments;
+        }
+        assembled[index] = current;
+      }
+    }
+
+    const toolCalls = assembled.filter((call) => call.name.length > 0);
+    if (!content && toolCalls.length === 0) {
+      throw new Error("LLM returned an empty response");
+    }
+
+    return { content: content || null, toolCalls, model };
+  }
 }
 
 function toOpenAiMessage(
