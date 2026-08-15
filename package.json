@@ -1,0 +1,25 @@
+{
+  "name": "coding-agent",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node --env-file-if-exists=.env src/index.ts",
+    "dev": "tsc --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "openai": "^7.4.0"
+  }
+}
