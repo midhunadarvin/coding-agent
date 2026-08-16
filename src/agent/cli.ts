@@ -70,10 +70,10 @@ export function parseCliArgs(argv: string[]): CliCommand {
 export const CLI_HELP = `coding-agent
 
 Usage:
-  npm start                         single session in the current directory
-  npm start -- --session <name>     isolated git worktree (.coding-agent/worktrees/<name>)
-  npm start -- --list               list worktree sessions
-  npm start -- --clean <name>       remove a clean worktree session
-  npm start -- --session <name> --docker [container]
-                                    worktree plus SANDBOX_PREFIX for remote bash
+  coding-agent                         session in the current directory
+  coding-agent --session <name>        isolated git worktree (.coding-agent/worktrees/<name>)
+  coding-agent --list                  list worktree sessions
+  coding-agent --clean <name>          remove a clean worktree session
+  coding-agent --session <name> --docker [container]
+                                       worktree plus SANDBOX_PREFIX for remote bash
 `;

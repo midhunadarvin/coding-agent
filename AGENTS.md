@@ -5,9 +5,12 @@
 - typecheck: `npx tsc --noEmit`
 - test: `npm test`
 - start: `npm start`
+- build CLI: `npm run build` then `npm link` (exposes `coding-agent`)
+- package tarball: `npm pack`
 
 ## Layout
 
+- `src/cli.ts` — packaged binary entry (`bin`: `coding-agent`)
 - `src/agent` — sessions, worktrees, permissions, prompt, skills
 - `src/llm` — model client
 - `src/workspace` — files, isolation, semantic search

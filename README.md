@@ -87,6 +87,35 @@ cp .env.example .env
 npm start
 ```
 
+## Install as a CLI
+
+Requires Node 22+. Build once, then link the `coding-agent` command:
+
+```bash
+npm run build
+npm link
+coding-agent --help
+```
+
+From another project:
+
+```bash
+coding-agent
+coding-agent --session auth
+```
+
+The command loads `.env` from the directory you run it in.
+
+To uninstall the link: `npm unlink -g coding-agent`.
+
+To ship a tarball (what `npm publish` would upload):
+
+```bash
+npm run pack:check    # list packaged files
+npm pack              # writes coding-agent-1.0.0.tgz
+npm install -g ./coding-agent-1.0.0.tgz
+```
+
 ### Parallel sessions
 
 Each `--session` is a git worktree under `.coding-agent/worktrees/<name>` on branch `agent/<name>`. File tools and `bash` cannot write back into the main checkout. New trees copy paths listed in `.worktreeinclude` (defaults to `.env`).

@@ -1,17 +1,30 @@
 {
   "name": "coding-agent",
   "version": "1.0.0",
-  "description": "",
+  "description": "Terminal coding agent",
   "type": "module",
+  "bin": {
+    "coding-agent": "dist/cli.js"
+  },
   "main": "dist/index.js",
   "exports": {
     ".": "./dist/index.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "AGENTS.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
+    "prepack": "npm run build",
     "start": "node --env-file-if-exists=.env src/index.ts",
     "dev": "tsc --watch",
-    "test": "node --experimental-strip-types --test src/tools/edit.test.ts src/workspace/workspace.test.ts src/workspace/repos.test.ts src/agent/permissions/gate.test.ts src/agent/truncate.test.ts src/tools/bash.test.ts src/tools/sandbox.test.ts src/workspace/lexical.test.ts src/tools/html.test.ts src/agent/cli.test.ts src/workspace/isolation.test.ts"
+    "test": "node --experimental-strip-types --test src/tools/edit.test.ts src/workspace/workspace.test.ts src/workspace/repos.test.ts src/agent/permissions/gate.test.ts src/agent/truncate.test.ts src/tools/bash.test.ts src/tools/sandbox.test.ts src/workspace/lexical.test.ts src/tools/html.test.ts src/agent/cli.test.ts src/workspace/isolation.test.ts",
+    "pack:check": "npm pack --dry-run"
   },
   "keywords": [],
   "author": "",
