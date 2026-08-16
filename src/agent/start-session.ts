@@ -1,22 +1,26 @@
-import { printBanner } from "../ui/banner.ts";
-import { createAgentFileStore, isolateFileStore, type IsolationPolicy } from "../workspace/index.ts";
 import { createLlmProvider } from "../llm/index.ts";
 import { createAgentTools, type TodoItem } from "../tools/index.ts";
+import { printBanner } from "../ui/banner.ts";
+import {
+  createAgentFileStore,
+  isolateFileStore,
+  type IsolationPolicy,
+} from "../workspace/index.ts";
 import { loadAgentsMd } from "./agents-md.ts";
 import { loadPackageVersion } from "./package-info.ts";
 import { createPermissionGate, loadPermissionMode } from "./permissions/index.ts";
+import { runSession } from "./session.ts";
 import { createSessionLog } from "./session-log.ts";
 import { loadSkills, toSkillMeta } from "./skills.ts";
-import { buildSystemPrompt } from "./system-prompt.ts";
-import { runSession } from "./session.ts";
 import { createStdio } from "./stdio.ts";
+import { buildSystemPrompt } from "./system-prompt.ts";
 
-export interface SingleAgentOptions {
+export interface SessionOptions {
   sessionName?: string;
   isolation?: IsolationPolicy;
 }
 
-export async function startSingleAgent(options: SingleAgentOptions = {}): Promise<void> {
+export async function startSession(options: SessionOptions = {}): Promise<void> {
   const permissionMode = loadPermissionMode();
   const skills = await loadSkills();
   const agentsMd = await loadAgentsMd();

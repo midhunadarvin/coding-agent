@@ -7,13 +7,12 @@ A terminal coding agent. It reads a prompt from stdin, calls an OpenAI-compatibl
 The process is a single loop: **user → model → tools → model → reply**.
 
 ```text
-src/index.ts  →  multi-agent CLI
+src/index.ts  →  agent/dispatch (CLI)
                     │
-                    ├─ --session name  →  git worktree + isolation
-                    │                       │
-                    └─ default / after chdir ─→  single-agent
-                                                 banner · tools · REPL
-                                                 user → model → tools → reply
+                    ├─ --session name  →  enter worktree, then startSession
+                    └─ default         →  startSession in cwd
+                                           banner · tools · REPL
+                                           user → model → tools → reply
 ```
 
 Layers do not reach across each other:

@@ -1,5 +1,5 @@
-export { startSingleAgent, type SingleAgentOptions } from "./start-single.ts";
-export { startMultiAgent } from "./start-multi.ts";
+export { startSession, type SessionOptions } from "./start-session.ts";
+export { runCli } from "./dispatch.ts";
 export { runSession } from "./session.ts";
 export { createStdio, type InputOutput } from "./stdio.ts";
 export { parseCliArgs, CLI_HELP, type CliCommand } from "./cli.ts";

@@ -1,10 +1,10 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { startMultiAgent } from "./agent/index.ts";
+import { runCli } from "./agent/index.ts";
 
 export {
-  startMultiAgent,
-  startSingleAgent,
+  runCli,
+  startSession,
   createStdio,
   runSession,
   parseCliArgs,
@@ -49,7 +49,7 @@ const isDirectRun =
   path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 
 if (isDirectRun) {
-  startMultiAgent().catch((error: unknown) => {
+  runCli().catch((error: unknown) => {
     console.error(error instanceof Error ? error.message : error);
     process.exitCode = 1;
   });

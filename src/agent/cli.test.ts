@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 import { parseCliArgs } from "./cli.ts";
 
 describe("parseCliArgs", () => {
-  it("defaults to a single-agent run", () => {
+  it("defaults to a session in the current directory", () => {
     assert.deepEqual(parseCliArgs([]), { kind: "run", session: undefined, docker: undefined });
   });
 
