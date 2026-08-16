@@ -42,8 +42,8 @@ export function createGrepTool(files: FileStore): Tool {
         const start = files.resolve(scope);
         const info = await stat(start);
         const targets = info.isFile()
-          ? [toWorkspacePath(files.root, start)]
-          : collectFiles(files.root, start);
+          ? [files.toLogicalPath(start)]
+          : collectScopedFiles(files, start);
 
         const matches: string[] = [];
         for await (const filePath of targets) {
@@ -82,12 +82,19 @@ export function createGrepTool(files: FileStore): Tool {
   };
 }
 
-async function* collectFiles(workspaceRoot: string, start: string): AsyncGenerator<string> {
-  for await (const relative of walkWorkspaceFiles(start, start)) {
-    yield toWorkspacePath(workspaceRoot, path.join(start, relative));
+async function* collectScopedFiles(
+  files: import("../file/interface.ts").FileStore,
+  start: string,
+): AsyncGenerator<string> {
+  if (start === files.root) {
+    for (const workspace of files.roots()) {
+      for await (const relative of walkWorkspaceFiles(workspace.root, workspace.root)) {
+        yield files.toLogicalPath(path.join(workspace.root, relative));
+      }
+    }
+    return;
   }
-}
-
-function toWorkspacePath(workspaceRoot: string, absolutePath: string): string {
-  return path.relative(workspaceRoot, absolutePath).replaceAll("\\", "/");
+  for await (const relative of walkWorkspaceFiles(start, start)) {
+    yield files.toLogicalPath(path.join(start, relative));
+  }
 }

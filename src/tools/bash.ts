@@ -1,7 +1,8 @@
 import { spawn } from "node:child_process";
 import type { FileStore } from "../file/interface.ts";
 import { structuredError } from "./aci.ts";
-import { optionalInteger, requireString } from "./args.ts";
+import { optionalInteger, optionalString, requireString } from "./args.ts";
+import { wrapSandboxedCommand } from "./sandbox.ts";
 import type { Tool } from "./types.ts";
 
 const DEFAULT_TIMEOUT_MS = 60_000;
@@ -28,11 +29,15 @@ export function createBashTool(files: FileStore): Tool {
     definition: {
       name: "bash",
       description:
-        "Run an allowlisted shell command in the workspace (typecheck, tests, npm scripts, safe git). Destructive git is blocked.",
+        "Run an allowlisted shell command in a workspace root (typecheck, tests, npm scripts, safe git). Destructive git is blocked. Set SANDBOX_PREFIX to run remotely (docker/ssh).",
       parameters: {
         type: "object",
         properties: {
           command: { type: "string", description: "Command to run" },
+          repo: {
+            type: "string",
+            description: "Optional extra repo name from list_repos (sets cwd)",
+          },
           timeout_ms: { type: "integer", description: "Timeout in milliseconds (default 60000)" },
         },
         required: ["command"],
@@ -40,6 +45,7 @@ export function createBashTool(files: FileStore): Tool {
     },
     async execute(args: Record<string, unknown>): Promise<string> {
       const command = requireString(args, "command");
+      const repo = optionalString(args, "repo");
       const timeoutMs = optionalInteger(args, "timeout_ms") ?? DEFAULT_TIMEOUT_MS;
       const reason = denyReason(command);
       if (reason) {
@@ -47,7 +53,8 @@ export function createBashTool(files: FileStore): Tool {
       }
 
       try {
-        const result = await runCommand(command, files.root, timeoutMs);
+        const cwd = resolveRepoCwd(files, repo);
+        const result = await runCommand(wrapSandboxedCommand(command), cwd, timeoutMs);
         const output = [result.stdout, result.stderr].filter(Boolean).join("\n").trim();
         return `OK bash\nexit: ${result.exitCode}\n${output || "(no output)"}`;
       } catch (error) {
@@ -68,6 +75,17 @@ export function denyReason(command: string): string | undefined {
     return "Command is not on the allowlist (npx tsc, npm test/start/run, node --test, git status/diff/log/show/add/commit/branch)";
   }
   return undefined;
+}
+
+function resolveRepoCwd(files: FileStore, repo?: string): string {
+  if (!repo) {
+    return files.root;
+  }
+  const match = files.roots().find((workspace) => workspace.name === repo);
+  if (!match) {
+    throw new Error(`Unknown repo: ${repo}`);
+  }
+  return match.root;
 }
 
 function runCommand(

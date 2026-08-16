@@ -1,6 +1,6 @@
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import type { DirEntry, FileStore } from "./interface.ts";
+import type { DirEntry, FileStore, WorkspaceRoot } from "./interface.ts";
 
 export function createWorkspaceFileStore(root: string = process.cwd()): FileStore {
   return new WorkspaceFileStore(root);
@@ -8,9 +8,19 @@ export function createWorkspaceFileStore(root: string = process.cwd()): FileStor
 
 class WorkspaceFileStore implements FileStore {
   readonly root: string;
+  private readonly alias: string;
 
-  constructor(root: string) {
+  constructor(root: string, alias?: string) {
     this.root = path.resolve(root);
+    this.alias = alias ?? path.basename(this.root) ?? "workspace";
+  }
+
+  roots(): WorkspaceRoot[] {
+    return [{ name: this.alias, root: this.root }];
+  }
+
+  toLogicalPath(absolutePath: string): string {
+    return path.relative(this.root, absolutePath).replaceAll("\\", "/");
   }
 
   async read(filePath: string): Promise<string> {

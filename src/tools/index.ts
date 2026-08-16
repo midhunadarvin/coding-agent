@@ -6,11 +6,16 @@ import { createEditFileTool } from "./edit.ts";
 import { createExploreAgentTool } from "./explore-agent.ts";
 import { createGlobTool } from "./glob.ts";
 import { createGrepTool } from "./grep.ts";
+import { createLspTools } from "./lsp.ts";
 import { createLsTool } from "./ls.ts";
 import { createReadFileTool } from "./read-file.ts";
 import { createReadSkillTool } from "./read-skill.ts";
+import { createListReposTool } from "./repos.ts";
+import { createSemanticSearchTool } from "./semantic-search.ts";
 import { createSubmitPlanTool, type TurnState } from "./submit-plan.ts";
 import { createTodoWriteTool, type TodoItem } from "./todo.ts";
+import { createWebFetchTool } from "./web-fetch.ts";
+import { createWebSearchTool } from "./web-search.ts";
 import { createWriteFileTool } from "./write-file.ts";
 import type { Tool } from "./types.ts";
 
@@ -21,11 +26,17 @@ export { createEditFileTool, countOccurrences } from "./edit.ts";
 export { createExploreAgentTool } from "./explore-agent.ts";
 export { createGlobTool } from "./glob.ts";
 export { createGrepTool } from "./grep.ts";
+export { createLspTools } from "./lsp.ts";
 export { createLsTool } from "./ls.ts";
 export { createReadFileTool } from "./read-file.ts";
 export { createReadSkillTool } from "./read-skill.ts";
+export { createListReposTool } from "./repos.ts";
+export { wrapSandboxedCommand, shellEscape } from "./sandbox.ts";
+export { createSemanticSearchTool } from "./semantic-search.ts";
 export { createSubmitPlanTool, MUTATING_TOOLS, type TurnState } from "./submit-plan.ts";
 export { createTodoWriteTool, type TodoItem } from "./todo.ts";
+export { createWebFetchTool } from "./web-fetch.ts";
+export { createWebSearchTool } from "./web-search.ts";
 export { createWriteFileTool } from "./write-file.ts";
 export { prepareToolCall, runPreparedTool, type PreparedToolCall } from "./runtime.ts";
 
@@ -47,6 +58,11 @@ export function createAgentTools(options: AgentToolOptions): Tool[] {
     createGrepTool(options.files),
     createGlobTool(options.files),
     createLsTool(options.files),
+    createSemanticSearchTool(options.files),
+    createListReposTool(options.files),
+    createWebFetchTool(),
+    createWebSearchTool(),
+    ...createLspTools(options.files),
   ];
 
   return [

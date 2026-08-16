@@ -20,4 +20,5 @@
 
 - ESM with `.ts` import specifiers
 - Tool traces and prompts go to stderr; model text goes to stdout
-- Paths stay inside the working directory
+- Paths stay inside attached workspaces. Extra repos use `name:relative/path`.
+- `AGENT_REPOS` attaches more trees; `SANDBOX_PREFIX` runs bash in docker/ssh.

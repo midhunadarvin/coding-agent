@@ -32,17 +32,19 @@ export function createGlobTool(files: FileStore): Tool {
         const matcher = compileGlob(pattern);
         const start = files.resolve(scope);
         const hits: string[] = [];
+        const workspaces =
+          start === files.root ? files.roots() : [{ name: "", root: start }];
 
-        for await (const relative of walkWorkspaceFiles(start, start)) {
-          const workspacePath = path
-            .relative(files.root, path.join(start, relative))
-            .replaceAll("\\", "/");
-          if (!matcher(workspacePath) && !matcher(path.posix.basename(workspacePath))) {
-            continue;
-          }
-          hits.push(workspacePath);
-          if (hits.length >= maxResults) {
-            break;
+        outer: for (const workspace of workspaces) {
+          for await (const relative of walkWorkspaceFiles(workspace.root, workspace.root)) {
+            const workspacePath = files.toLogicalPath(path.join(workspace.root, relative));
+            if (!matcher(workspacePath) && !matcher(path.posix.basename(relative))) {
+              continue;
+            }
+            hits.push(workspacePath);
+            if (hits.length >= maxResults) {
+              break outer;
+            }
           }
         }
 

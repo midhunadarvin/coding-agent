@@ -11,6 +11,10 @@ export function createMemoryFileStore(
 
   return {
     root,
+    roots: () => [{ name: "workspace", root }],
+    toLogicalPath(absolutePath: string): string {
+      return normalize(path.relative(root, absolutePath));
+    },
     async read(filePath: string): Promise<string> {
       const resolved = this.resolve(filePath);
       const relative = normalize(path.relative(root, resolved));

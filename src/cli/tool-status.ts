@@ -10,6 +10,13 @@ const TOOL_ICONS: Record<string, string> = {
   submit_plan: "🗺️",
   read_skill: "📘",
   explore: "🧭",
+  web_fetch: "🌐",
+  web_search: "🔍",
+  semantic_search: "🧠",
+  lsp_diagnostics: "🩺",
+  lsp_hover: "💡",
+  lsp_definition: "🎯",
+  list_repos: "📚",
 };
 
 export function toolIcon(name: string): string {
@@ -38,6 +45,12 @@ function summarizeArguments(rawArguments: string): string {
     }
     if (typeof args.question === "string" && args.question.length > 0) {
       return args.question;
+    }
+    if (typeof args.query === "string" && args.query.length > 0) {
+      return args.query;
+    }
+    if (typeof args.url === "string" && args.url.length > 0) {
+      return args.url;
     }
   } catch {
     // Fall through to a short raw preview.

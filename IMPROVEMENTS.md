@@ -53,7 +53,7 @@ Progressive disclosure: a one-line description is always visible; the full playb
 
 Keep these off the critical path unless a real task needs them.
 
-- [ ] Web search / fetch
-- [ ] Embedding-based code retrieval
-- [ ] IDE / LSP integration
-- [ ] Multi-repo or remote sandbox
+- [x] Web search / fetch
+- [x] Embedding-based code retrieval
+- [x] IDE / LSP integration
+- [x] Multi-repo or remote sandbox

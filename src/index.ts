@@ -1,7 +1,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { printBanner } from "./cli/banner.ts";
-import { createWorkspaceFileStore } from "./file/index.ts";
+import { createAgentFileStore } from "./file/index.ts";
 import { createLlmProvider } from "./llm/index.ts";
 import { createSessionLog } from "./log/session-log.ts";
 import { loadPackageVersion } from "./package-info.ts";
@@ -15,7 +15,7 @@ import { createStdio, runSession } from "./session.ts";
 import { loadSkills, toSkillMeta } from "./skills/index.ts";
 import { createAgentTools, type TodoItem } from "./tools/index.ts";
 
-export { createWorkspaceFileStore, type FileStore } from "./file/index.ts";
+export { createAgentFileStore, createWorkspaceFileStore, type FileStore } from "./file/index.ts";
 export {
   createLlmProvider,
   loadLlmConfig,
@@ -61,7 +61,7 @@ async function main(): Promise<void> {
   const todos: TodoItem[] = [];
   const turn = { planned: false };
   const llm = createLlmProvider();
-  const files = createWorkspaceFileStore();
+  const files = createAgentFileStore();
   const tools = createAgentTools({ files, llm, skills, todos, turn });
   const io = createStdio();
   const permissions = createPermissionGate({

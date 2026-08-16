@@ -54,7 +54,14 @@ Layers do not reach across each other:
 | `todo_write`  | Session checklist                                            |
 | `submit_plan` | Required before mutating files or running the shell          |
 | `read_skill`  | Load a `SKILL.md` playbook                                   |
-| `explore`     | Read-only subagent for codebase questions                    |
+| `explore`          | Read-only subagent for codebase questions                    |
+| `web_search`       | Search the public web                                        |
+| `web_fetch`        | Fetch an http(s) URL as text                                 |
+| `semantic_search`  | Embedding search over the workspace                          |
+| `lsp_diagnostics`  | TypeScript diagnostics                                       |
+| `lsp_hover`        | Type information at a position                               |
+| `lsp_definition`   | Go to definition                                             |
+| `list_repos`       | List primary and extra workspaces                            |
 
 Tools depend on `FileStore`, not `fs` directly. The LLM layer only sees names, descriptions, and JSON arguments.
 
@@ -82,6 +89,9 @@ src/
   prompt/            system prompt and AGENTS.md loader
   skills/            SKILL.md discovery
   context/           output truncation and history compaction
+  retrieve/          lexical embeddings for semantic search
+  lsp/               TypeScript language-service adapter
+  web/               HTML extract helpers
 skills/              verify, explore, debug, review, git-commit, plan
 ```
 
@@ -111,6 +121,8 @@ node --env-file=.env src/index.ts
 | `TOOL_PERMISSIONS` | `prompt` \| `allow` \| `deny` | `prompt` on a TTY, else `deny`  |
 | `NO_COLOR`         | Disable ANSI color            | unset                           |
 | `SESSION_LOG`      | `1` writes a JSONL transcript | unset                           |
+| `AGENT_REPOS`      | Extra repos `name=path,...`   | unset                           |
+| `SANDBOX_PREFIX`   | Remote bash prefix            | unset                           |
 
 Point `LLM_BASE_URL` at any compatible host, including OpenCode Go (`https://opencode.ai/zen/go/v1`).
 

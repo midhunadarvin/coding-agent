@@ -11,7 +11,7 @@
     "build": "tsc",
     "start": "node --env-file-if-exists=.env src/index.ts",
     "dev": "tsc --watch",
-    "test": "node --experimental-strip-types --test src/tools/edit.test.ts src/file/workspace.test.ts src/permissions/gate.test.ts src/context/truncate.test.ts src/tools/bash.test.ts"
+    "test": "node --experimental-strip-types --test src/tools/edit.test.ts src/file/workspace.test.ts src/file/repos.test.ts src/permissions/gate.test.ts src/context/truncate.test.ts src/tools/bash.test.ts src/tools/sandbox.test.ts src/retrieve/lexical.test.ts src/web/html.test.ts"
   },
   "keywords": [],
   "author": "",
