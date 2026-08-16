@@ -1,4 +1,4 @@
-import type { FileStore } from "../file/interface.ts";
+import type { FileStore } from "../workspace/interface.ts";
 import type { Tool } from "./types.ts";
 
 export function createListReposTool(files: FileStore): Tool {

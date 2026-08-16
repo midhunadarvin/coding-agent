@@ -1,6 +1,6 @@
 import path from "node:path";
-import type { FileStore } from "../file/interface.ts";
-import { walkWorkspaceFiles } from "../file/walk.ts";
+import type { FileStore } from "../workspace/interface.ts";
+import { walkWorkspaceFiles } from "../workspace/walk.ts";
 import { structuredError } from "./aci.ts";
 import { optionalInteger, optionalString, requireString } from "./args.ts";
 import type { Tool } from "./types.ts";

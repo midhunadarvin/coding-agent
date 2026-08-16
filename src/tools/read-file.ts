@@ -1,4 +1,4 @@
-import type { FileStore } from "../file/interface.ts";
+import type { FileStore } from "../workspace/interface.ts";
 import { formatReadOutput, structuredError } from "./aci.ts";
 import { optionalInteger, requireString } from "./args.ts";
 import type { Tool } from "./types.ts";

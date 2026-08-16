@@ -1,7 +1,7 @@
 import { structuredError } from "./aci.ts";
 import { optionalInteger, requireString } from "./args.ts";
 import type { Tool } from "./types.ts";
-import { htmlToText } from "../web/html.ts";
+import { htmlToText } from "./html.ts";
 
 export interface SearchHit {
   title: string;

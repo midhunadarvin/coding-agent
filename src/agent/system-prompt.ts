@@ -1,4 +1,4 @@
-import type { SkillMeta } from "../skills/types.ts";
+import type { SkillMeta } from "./skills.ts";
 
 export function buildSystemPrompt(options: {
   agentsMd?: string;

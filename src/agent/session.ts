@@ -1,16 +1,15 @@
-import { createInterface, type Interface } from "node:readline/promises";
-import { createSpinner } from "./cli/spinner.ts";
-import { formatToolLabel } from "./cli/tool-status.ts";
-import { compactHistory } from "./context/compact.ts";
-import { truncateOutput } from "./context/truncate.ts";
-import type { SessionLog } from "./log/session-log.ts";
 import type {
   ChatMessage,
   ChatResponse,
   LlmProvider,
   ToolDefinition,
-} from "./llm/types.ts";
+} from "../llm/types.ts";
+import { createSpinner } from "../ui/spinner.ts";
+import { formatToolLabel } from "../ui/tool-status.ts";
+import { compactHistory } from "./compact.ts";
 import type { PermissionGate } from "./permissions/types.ts";
+import type { SessionLog } from "./session-log.ts";
+import { truncateOutput } from "./truncate.ts";
 import {
   MUTATING_TOOLS,
   prepareToolCall,
@@ -18,90 +17,8 @@ import {
   type TodoItem,
   type Tool,
   type TurnState,
-} from "./tools/index.ts";
-
-export interface InputOutput {
-  read(): Promise<string | null>;
-  ask(question: string): Promise<string | null>;
-  write(output: string): void;
-  writeDelta(output: string): void;
-  close(): void;
-}
-
-export function createStdio(): InputOutput {
-  const interactive = Boolean(process.stdin.isTTY);
-  const rl: Interface = createInterface({
-    input: process.stdin,
-    output: process.stderr,
-    terminal: interactive,
-  });
-  let closed = false;
-  rl.on("close", () => {
-    closed = true;
-  });
-
-  async function ask(question: string): Promise<string | null> {
-    if (closed) {
-      return null;
-    }
-
-    try {
-      return await rl.question(question);
-    } catch {
-      return null;
-    }
-  }
-
-  return {
-    async read(): Promise<string | null> {
-      if (!interactive) {
-        return ask("");
-      }
-
-      const first = await ask("> ");
-      if (first === null) {
-        return null;
-      }
-      if (first.trim() === '"""') {
-        const lines: string[] = [];
-        for (;;) {
-          const line = await ask("| ");
-          if (line === null || line.trim() === '"""') {
-            break;
-          }
-          lines.push(line);
-        }
-        return lines.join("\n");
-      }
-      if (first.endsWith("\\")) {
-        const lines = [first.slice(0, -1)];
-        for (;;) {
-          const line = await ask("| ");
-          if (line === null) {
-            break;
-          }
-          if (!line.endsWith("\\")) {
-            lines.push(line);
-            break;
-          }
-          lines.push(line.slice(0, -1));
-        }
-        return lines.join("\n");
-      }
-      return first;
-    },
-    ask,
-    write(output: string): void {
-      process.stdout.write(output.endsWith("\n") ? output : `${output}\n`);
-    },
-    writeDelta(output: string): void {
-      process.stdout.write(output);
-    },
-    close(): void {
-      rl.close();
-    },
-  };
-}
+} from "../tools/index.ts";
+import type { InputOutput } from "./stdio.ts";
 
 const MAX_TOOL_ROUNDS = 20;
 const MAX_EMPTY_RETRIES = 2;

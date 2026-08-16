@@ -1,6 +1,7 @@
-import type { FileStore } from "../file/interface.ts";
+import type { FileStore } from "../workspace/interface.ts";
 import type { LlmProvider } from "../llm/types.ts";
-import type { Skill } from "../skills/types.ts";
+import type { IsolationPolicy } from "../workspace/isolation.ts";
+import type { Skill } from "../agent/skills.ts";
 import { createBashTool } from "./bash.ts";
 import { createEditFileTool } from "./edit.ts";
 import { createExploreAgentTool } from "./explore-agent.ts";
@@ -46,6 +47,7 @@ export interface AgentToolOptions {
   skills: Skill[];
   todos: TodoItem[];
   turn: TurnState;
+  isolation?: IsolationPolicy;
 }
 
 export function createFileTools(files: FileStore): Tool[] {
@@ -69,7 +71,7 @@ export function createAgentTools(options: AgentToolOptions): Tool[] {
     ...readOnly,
     createWriteFileTool(options.files),
     createEditFileTool(options.files),
-    createBashTool(options.files),
+    createBashTool(options.files, options.isolation),
     createTodoWriteTool(options.todos),
     createSubmitPlanTool(options.turn),
     createReadSkillTool(options.skills),

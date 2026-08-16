@@ -1,5 +1,5 @@
-import type { FileStore } from "../file/interface.ts";
-import { walkWorkspaceFiles } from "../file/walk.ts";
+import type { FileStore } from "./interface.ts";
+import { walkWorkspaceFiles } from "./walk.ts";
 import {
   chunkSource,
   cosineSimilarity,

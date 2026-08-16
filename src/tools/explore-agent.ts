@@ -1,5 +1,5 @@
 import type { ChatMessage, LlmProvider } from "../llm/types.ts";
-import { createPermissionGate } from "../permissions/gate.ts";
+import { createPermissionGate } from "../agent/permissions/gate.ts";
 import { structuredError } from "./aci.ts";
 import { requireString } from "./args.ts";
 import { prepareToolCall, runPreparedTool } from "./runtime.ts";

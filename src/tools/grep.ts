@@ -1,7 +1,7 @@
 import { stat } from "node:fs/promises";
 import path from "node:path";
-import type { FileStore } from "../file/interface.ts";
-import { walkWorkspaceFiles } from "../file/walk.ts";
+import type { FileStore } from "../workspace/interface.ts";
+import { walkWorkspaceFiles } from "../workspace/walk.ts";
 import { structuredError } from "./aci.ts";
 import { optionalInteger, optionalString, requireString } from "./args.ts";
 import type { Tool } from "./types.ts";
@@ -83,7 +83,7 @@ export function createGrepTool(files: FileStore): Tool {
 }
 
 async function* collectScopedFiles(
-  files: import("../file/interface.ts").FileStore,
+  files: import("../workspace/interface.ts").FileStore,
   start: string,
 ): AsyncGenerator<string> {
   if (start === files.root) {

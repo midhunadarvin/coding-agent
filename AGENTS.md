@@ -8,12 +8,11 @@
 
 ## Layout
 
-- `src/llm` — provider types, env config, OpenAI-compatible client
-- `src/file` — workspace-scoped file I/O
-- `src/tools` — LLM tools
-- `src/permissions` — tool permission gate
-- `src/cli` — banner, spinner, permission layout
-- `src/session.ts` — stdin/stdout loop
+- `src/agent` — sessions, worktrees, permissions, prompt, skills
+- `src/llm` — model client
+- `src/workspace` — files, isolation, semantic search
+- `src/tools` — tool implementations
+- `src/ui` — banner and terminal chrome
 - `skills/` — SKILL.md playbooks
 
 ## Rules

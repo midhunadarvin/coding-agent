@@ -1,4 +1,4 @@
-import { formatPermissionPrompt } from "../cli/permission-view.ts";
+import { formatPermissionPrompt } from "../../ui/permission-view.ts";
 import type {
   PermissionDecision,
   PermissionGate,

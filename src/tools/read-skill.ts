@@ -1,4 +1,4 @@
-import type { Skill } from "../skills/types.ts";
+import type { Skill } from "../agent/skills.ts";
 import { structuredError } from "./aci.ts";
 import { requireString } from "./args.ts";
 import type { Tool } from "./types.ts";

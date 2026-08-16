@@ -1,7 +1,16 @@
 import { readdir, readFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import type { Skill, SkillMeta } from "./types.ts";
+
+export interface SkillMeta {
+  name: string;
+  description: string;
+  filePath: string;
+}
+
+export interface Skill extends SkillMeta {
+  body: string;
+}
 
 export async function loadSkills(cwd: string = process.cwd()): Promise<Skill[]> {
   const directories = [

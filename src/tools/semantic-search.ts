@@ -1,5 +1,5 @@
-import type { FileStore } from "../file/interface.ts";
-import { semanticSearch } from "../retrieve/index.ts";
+import type { FileStore } from "../workspace/interface.ts";
+import { semanticSearch } from "../workspace/retrieve.ts";
 import { structuredError } from "./aci.ts";
 import { optionalInteger, requireString } from "./args.ts";
 import type { Tool } from "./types.ts";

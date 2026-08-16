@@ -1,5 +1,5 @@
 import { toolIcon } from "./tool-status.ts";
-import type { PermissionRequest } from "../permissions/types.ts";
+import type { PermissionRequest } from "../agent/permissions/types.ts";
 
 const RESET = "\x1b[0m";
 const BOLD = "\x1b[1m";

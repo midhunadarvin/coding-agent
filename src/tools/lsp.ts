@@ -1,5 +1,5 @@
-import type { FileStore } from "../file/interface.ts";
-import { getDefinition, getDiagnostics, getHover } from "../lsp/typescript-service.ts";
+import type { FileStore } from "../workspace/interface.ts";
+import { getDefinition, getDiagnostics, getHover } from "./lsp-service.ts";
 import { structuredError } from "./aci.ts";
 import { optionalInteger, optionalString, requireString } from "./args.ts";
 import type { Tool } from "./types.ts";

@@ -1,7 +1,7 @@
 import { structuredError } from "./aci.ts";
 import { requireString } from "./args.ts";
 import type { Tool } from "./types.ts";
-import { assertHttpUrl, htmlToText } from "../web/html.ts";
+import { assertHttpUrl, htmlToText } from "./html.ts";
 
 const FETCH_LIMIT = 15_000;
 

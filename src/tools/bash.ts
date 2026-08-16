@@ -1,7 +1,9 @@
 import { spawn } from "node:child_process";
-import type { FileStore } from "../file/interface.ts";
+import type { FileStore } from "../workspace/interface.ts";
 import { structuredError } from "./aci.ts";
 import { optionalInteger, optionalString, requireString } from "./args.ts";
+import type { IsolationPolicy } from "../workspace/isolation.ts";
+import { denyIsolatedCommand } from "../workspace/isolation.ts";
 import { wrapSandboxedCommand } from "./sandbox.ts";
 import type { Tool } from "./types.ts";
 
@@ -24,7 +26,7 @@ const ALLOWED = [
   /^git\s+(status|diff|log|show|add|commit|branch|rev-parse)(\s|$)/,
 ];
 
-export function createBashTool(files: FileStore): Tool {
+export function createBashTool(files: FileStore, isolation?: IsolationPolicy): Tool {
   return {
     definition: {
       name: "bash",
@@ -54,6 +56,12 @@ export function createBashTool(files: FileStore): Tool {
 
       try {
         const cwd = resolveRepoCwd(files, repo);
+        if (isolation) {
+          const isolated = denyIsolatedCommand(command, cwd, isolation);
+          if (isolated) {
+            return structuredError("bash", isolated, { command });
+          }
+        }
         const result = await runCommand(wrapSandboxedCommand(command), cwd, timeoutMs);
         const output = [result.stdout, result.stderr].filter(Boolean).join("\n").trim();
         return `OK bash\nexit: ${result.exitCode}\n${output || "(no output)"}`;

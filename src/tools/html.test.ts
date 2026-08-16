@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { assertHttpUrl, htmlToText } from "./html.ts";
-import { parseDuckDuckGoLite } from "../tools/web-search.ts";
+import { parseDuckDuckGoLite } from "./web-search.ts";
 
 describe("html helpers", () => {
   it("strips tags and decodes entities", () => {

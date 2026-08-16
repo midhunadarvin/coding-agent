@@ -1,21 +1,25 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { printBanner } from "./cli/banner.ts";
-import { createAgentFileStore } from "./file/index.ts";
-import { createLlmProvider } from "./llm/index.ts";
-import { createSessionLog } from "./log/session-log.ts";
-import { loadPackageVersion } from "./package-info.ts";
-import {
+import { startMultiAgent } from "./agent/index.ts";
+
+export {
+  startMultiAgent,
+  startSingleAgent,
+  createStdio,
+  runSession,
+  parseCliArgs,
+  prepareWorktreeSession,
+  listWorktreeSessions,
   createPermissionGate,
   loadPermissionMode,
-} from "./permissions/index.ts";
-import { loadAgentsMd } from "./prompt/agents-md.ts";
-import { buildSystemPrompt } from "./prompt/system.ts";
-import { createStdio, runSession } from "./session.ts";
-import { loadSkills, toSkillMeta } from "./skills/index.ts";
-import { createAgentTools, type TodoItem } from "./tools/index.ts";
-
-export { createAgentFileStore, createWorkspaceFileStore, type FileStore } from "./file/index.ts";
+  type InputOutput,
+  type PermissionDecision,
+  type PermissionGate,
+  type PermissionMode,
+  type PermissionRequest,
+} from "./agent/index.ts";
+export { printBanner, renderBanner, type BannerInfo } from "./ui/index.ts";
+export { createAgentFileStore, createWorkspaceFileStore, type FileStore } from "./workspace/index.ts";
 export {
   createLlmProvider,
   loadLlmConfig,
@@ -29,16 +33,6 @@ export {
   type ToolDefinition,
 } from "./llm/index.ts";
 export {
-  createPermissionGate,
-  loadPermissionMode,
-  type PermissionDecision,
-  type PermissionGate,
-  type PermissionMode,
-  type PermissionRequest,
-} from "./permissions/index.ts";
-export { printBanner, renderBanner, type BannerInfo } from "./cli/banner.ts";
-export { createStdio, runSession, type InputOutput } from "./session.ts";
-export {
   createAgentTools,
   createEditFileTool,
   createFileTools,
@@ -50,53 +44,12 @@ export {
   type Tool,
 } from "./tools/index.ts";
 
-async function main(): Promise<void> {
-  const permissionMode = loadPermissionMode();
-  const skills = await loadSkills();
-  const agentsMd = await loadAgentsMd();
-  const systemPrompt = buildSystemPrompt({
-    agentsMd,
-    skills: toSkillMeta(skills),
-  });
-  const todos: TodoItem[] = [];
-  const turn = { planned: false };
-  const llm = createLlmProvider();
-  const files = createAgentFileStore();
-  const tools = createAgentTools({ files, llm, skills, todos, turn });
-  const io = createStdio();
-  const permissions = createPermissionGate({
-    mode: permissionMode,
-    ask: (question) => io.ask(question),
-  });
-  const log = await createSessionLog();
-
-  printBanner({
-    name: "coding-agent",
-    version: loadPackageVersion(),
-    model: process.env.LLM_MODEL ?? "grok-4.6",
-    workspace: process.cwd(),
-    permissions: permissionMode,
-    tools: tools.map((tool) => tool.definition.name),
-  });
-
-  try {
-    await runSession(llm, io, tools, permissions, {
-      systemPrompt,
-      turn,
-      todos,
-      log,
-    });
-  } finally {
-    io.close();
-  }
-}
-
 const isDirectRun =
   process.argv[1] !== undefined &&
   path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 
 if (isDirectRun) {
-  main().catch((error: unknown) => {
+  startMultiAgent().catch((error: unknown) => {
     console.error(error instanceof Error ? error.message : error);
     process.exitCode = 1;
   });
